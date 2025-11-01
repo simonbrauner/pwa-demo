@@ -21,10 +21,6 @@
             font-size: 1.25rem;
             padding: 1rem 2rem;
         }
-
-        .hidden {
-            display: none;
-        }
     </style>
 </head>
 
@@ -38,9 +34,6 @@
             <p style="text-align:center; margin-top: .5rem; display:flex; gap:1rem; justify-content:center;">
                 <button id="inc" type="button" class="contrast btn-large">Increment</button>
                 <button id="reset" type="button" class="secondary btn-large">Reset</button>
-            </p>
-            <p id="installArea" style="text-align:center; margin-top: .5rem;" class="hidden">
-                <button id="install" type="button" class="primary btn-large">Install</button>
             </p>
         </article>
     </main>
@@ -78,11 +71,7 @@
 
         load();
     </script>
-
     <script>
-        const installBtn = document.getElementById('install');
-        const installArea = document.getElementById('installArea');
-
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
                 navigator.serviceWorker.register('service-worker.js').then(function (registration) {
@@ -94,34 +83,6 @@
         } else {
             console.warn('Service Workers are not supported by this browser.');
         }
-
-        let deferredPrompt;
-
-        window.addEventListener('beforeinstallprompt', (event) => {
-            event.preventDefault();
-
-            deferredPrompt = event;
-
-            installArea.classList.remove('hidden');
-
-            console.log('Installation event captured and deferred.');
-        });
-
-        installBtn.addEventListener('click', async () => {
-            installArea.classList.add('hidden');
-
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-
-                const { outcome } = await deferredPrompt.userChoice;
-
-                console.log(`User responded to the installation prompt: ${outcome}`);
-
-                deferredPrompt = null;
-            } else {
-                console.log('Installation is not currently available.');
-            }
-        });
     </script>
 </body>
 
