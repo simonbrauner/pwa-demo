@@ -26,11 +26,12 @@
     <main class="container">
         <article>
             <header>
-                <h1 class="counter" id="counter">0</h1>
+                <h1 class="counter" id="counter" role="status" aria-live="polite">0</h1>
             </header>
 
-            <p style="text-align:center; margin-top: .5rem;">
+            <p style="text-align:center; margin-top: .5rem; display:flex; gap:1rem; justify-content:center;">
                 <button id="inc" type="button" class="contrast btn-large">Increment</button>
+                <button id="reset" type="button" class="secondary btn-large">Reset</button>
             </p>
         </article>
     </main>
@@ -38,12 +39,22 @@
     <script>
         (function () {
             const counterEl = document.getElementById('counter');
-            const btn = document.getElementById('inc');
+            const incBtn = document.getElementById('inc');
+            const resetBtn = document.getElementById('reset');
             let count = 0;
 
-            btn.addEventListener('click', () => {
-                count += 1;
+            function render() {
                 counterEl.textContent = count;
+            }
+
+            incBtn.addEventListener('click', () => {
+                count += 1;
+                render();
+            });
+
+            resetBtn.addEventListener('click', () => {
+                count = 0;
+                render();
             });
         })();
     </script>
