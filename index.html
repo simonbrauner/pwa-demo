@@ -26,7 +26,7 @@
     <main class="container">
         <article>
             <header>
-                <h1 class="counter" id="counter" role="status" aria-live="polite">0</h1>
+                <h1 class="counter" id="counter" role="status" aria-live="polite"></h1>
             </header>
 
             <p style="text-align:center; margin-top: .5rem; display:flex; gap:1rem; justify-content:center;">
@@ -41,21 +41,34 @@
             const counterEl = document.getElementById('counter');
             const incBtn = document.getElementById('inc');
             const resetBtn = document.getElementById('reset');
-            let count = 0;
+            const STORAGE_KEY = 'pwa-demo-counter';
+            counterEl.textContent = 0;
 
-            function render() {
-                counterEl.textContent = count;
+            function save() {
+                localStorage.setItem(STORAGE_KEY, String(counterEl.textContent));
+            }
+
+            function load() {
+                const v = localStorage.getItem(STORAGE_KEY);
+                if (v !== null) {
+                    const n = parseInt(v, 10);
+                    if (!Number.isNaN(n)) {
+                        counterEl.textContent = n;
+                    }
+                }
             }
 
             incBtn.addEventListener('click', () => {
-                count += 1;
-                render();
+                counterEl.textContent++;
+                save();
             });
 
             resetBtn.addEventListener('click', () => {
-                count = 0;
-                render();
+                counterEl.textContent = 0;
+                save();
             });
+
+            load();
         })();
     </script>
 </body>
