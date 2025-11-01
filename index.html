@@ -21,6 +21,10 @@
             font-size: 1.25rem;
             padding: 1rem 2rem;
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 
@@ -35,55 +39,89 @@
                 <button id="inc" type="button" class="contrast btn-large">Increment</button>
                 <button id="reset" type="button" class="secondary btn-large">Reset</button>
             </p>
+            <p id="installArea" style="text-align:center; margin-top: .5rem;" class="hidden">
+                <button id="install" type="button" class="primary btn-large">Install</button>
+            </p>
         </article>
     </main>
 
     <script>
-        (function () {
-            const counterEl = document.getElementById('counter');
-            const incBtn = document.getElementById('inc');
-            const resetBtn = document.getElementById('reset');
-            const STORAGE_KEY = 'pwa-demo-counter';
-            counterEl.textContent = 0;
+        const counterEl = document.getElementById('counter');
+        const incBtn = document.getElementById('inc');
+        const resetBtn = document.getElementById('reset');
+        const STORAGE_KEY = 'pwa-demo-counter';
+        counterEl.textContent = 0;
 
-            function save() {
-                localStorage.setItem(STORAGE_KEY, String(counterEl.textContent));
-            }
-
-            function load() {
-                const v = localStorage.getItem(STORAGE_KEY);
-                if (v !== null) {
-                    const n = parseInt(v, 10);
-                    if (!Number.isNaN(n)) {
-                        counterEl.textContent = n;
-                    }
-                }
-            }
-
-            incBtn.addEventListener('click', () => {
-                counterEl.textContent++;
-                save();
-            });
-
-            resetBtn.addEventListener('click', () => {
-                counterEl.textContent = 0;
-                save();
-            });
-
-            load();
-        })();
-    </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try {
-                    const reg = await navigator.serviceWorker.register('service-worker.js');
-                    console.log('Service worker registered:', reg.scope);
-                } catch (err) {
-                    console.warn('Service worker registration failed:', err);
-                }
-            });
+        function save() {
+            localStorage.setItem(STORAGE_KEY, String(counterEl.textContent));
         }
+
+        function load() {
+            const v = localStorage.getItem(STORAGE_KEY);
+            if (v !== null) {
+                const n = parseInt(v, 10);
+                if (!Number.isNaN(n)) {
+                    counterEl.textContent = n;
+                }
+            }
+        }
+
+        incBtn.addEventListener('click', () => {
+            counterEl.textContent++;
+            save();
+        });
+
+        resetBtn.addEventListener('click', () => {
+            counterEl.textContent = 0;
+            save();
+        });
+
+        load();
+    </script>
+
+    <script>
+        const installBtn = document.getElementById('install');
+        const installArea = document.getElementById('installArea');
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+                    console.log('Service Worker registration successful with scope: ', registration.scope);
+                }, function (err) {
+                    console.error('Service Worker registration failed: ', err);
+                });
+            });
+        } else {
+            console.warn('Service Workers are not supported by this browser.');
+        }
+
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (event) => {
+            event.preventDefault();
+
+            deferredPrompt = event;
+
+            installArea.classList.remove('hidden');
+
+            console.log('Installation event captured and deferred.');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            installArea.classList.add('hidden');
+
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+
+                const { outcome } = await deferredPrompt.userChoice;
+
+                console.log(`User responded to the installation prompt: ${outcome}`);
+
+                deferredPrompt = null;
+            } else {
+                console.log('Installation is not currently available.');
+            }
+        });
     </script>
 </body>
 
