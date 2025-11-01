@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Counter</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@latest/css/pico.min.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/icon-192.png">
     <style>
         .counter {
             font-size: 6rem;
@@ -70,6 +72,18 @@
 
             load();
         })();
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const reg = await navigator.serviceWorker.register('service-worker.js');
+                    console.log('Service worker registered:', reg.scope);
+                } catch (err) {
+                    console.warn('Service worker registration failed:', err);
+                }
+            });
+        }
     </script>
 </body>
 
